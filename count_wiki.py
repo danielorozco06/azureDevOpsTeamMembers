@@ -27,9 +27,11 @@ if __name__ == "__main__":
 
         new_content = []
         for page in content:
-            views = len(page["viewStats"]) if page["viewStats"] else 0
-            obj = {"path": page["path"], "views": views}
-            new_content.append(obj)
+            path = page["path"]
+            if "/Lineamientos Areas Transversales de TI/DevOps/" in path:
+                views = len(page["viewStats"]) if page["viewStats"] else 0
+                obj = {"path": path, "views": views}
+                new_content.append(obj)
 
         # sort by views
         new_content.sort(key=lambda x: x["views"], reverse=True)
