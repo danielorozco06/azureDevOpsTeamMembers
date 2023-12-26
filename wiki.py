@@ -61,7 +61,7 @@ def get_pages_batch(org_url: str, project: str, headers: dict[str, str]) -> None
 def create_json_file(path_file: str, data: list[dict[str, str]]) -> None:
     """Create a json file"""
     with open(path_file, "a", encoding="utf-8") as file:
-        json.dump(data, file, indent=4)
+        json.dump(data, file, ensure_ascii=False, indent=4)
 
 
 def remove_file(path_file: str) -> None:
