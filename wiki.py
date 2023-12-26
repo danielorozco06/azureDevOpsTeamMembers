@@ -39,7 +39,7 @@ def get_wiki(org_url: str, project: str, headers: dict[str, str]) -> dict[str, s
 
 
 def get_pages_batch(org_url: str, project: str, headers: dict[str, str]) -> None:
-    """Returns pageable list of Wiki Pages"""
+    """Fetches pageable list of Wiki Pages and writes them to a JSON file."""
     # The maximum number of pages to return in a page is 100
     top = 100
 
@@ -49,35 +49,31 @@ def get_pages_batch(org_url: str, project: str, headers: dict[str, str]) -> None
     wiki_id = "10978e98-31dc-4fe7-9a40-7854c9591ef1"
     body = {"pageViewsForDays": page_views_for_days, "top": top}
     url = f"{org_url}/{project}/_apis/wiki/wikis/{wiki_id}/pagesbatch?api-version=7.2-preview.1"
-    response = requests.post(url, headers=headers, json=body)
-    response.raise_for_status()
-    pages = response.json()["value"]
 
-    path_file = "data.json"
-    remove_file(path_file)
-
-    while pages:
-        create_json_file(path_file, pages)
-        body = {
-            "continuationToken": response.headers.get("X-MS-ContinuationToken"),
-            "pageViewsForDays": page_views_for_days,
-            "top": top,
-        }
+    all_pages = []
+    while True:
+        print(f"Fetching pages from {body['continuationToken'] or 'start'}")
         response = requests.post(url, headers=headers, json=body)
         response.raise_for_status()
-        pages = response.json()["value"]
+        pages = response.json().get("value", [])
+
+        # If no more pages, break out of the loop
+        if not pages:
+            break
+
+        # Add the fetched pages to the all_pages list
+        all_pages.extend(pages)
+        body["continuationToken"] = response.headers.get("X-MS-ContinuationToken")
+
+    path_file = "data.json"
+    create_json_file(path_file, all_pages)
 
 
 def create_json_file(path_file: str, data: list[dict[str, str]]) -> None:
-    """Create a json file"""
-    with open(path_file, "a", encoding="utf-8") as file:
+    """Create a json file with the provided data."""
+    # Use "w" mode to overwrite existing file
+    with open(path_file, "w", encoding="utf-8") as file:
         json.dump(data, file, ensure_ascii=False, indent=4)
-
-
-def remove_file(path_file: str) -> None:
-    """Remove a file if it exists"""
-    if os.path.isfile(path_file):
-        os.remove(path_file)
 
 
 if __name__ == "__main__":
