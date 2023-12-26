@@ -28,7 +28,7 @@ if __name__ == "__main__":
         new_content = []
         for page in content:
             path = page["path"]
-            if "/Lineamientos Areas Transversales de TI/" in path:
+            if "/Lineamientos Areas Transversales de TI/DevOps/" in path:
                 counts = 0
 
                 # check if the page has views stats
