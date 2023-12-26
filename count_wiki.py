@@ -28,10 +28,18 @@ if __name__ == "__main__":
         new_content = []
         for page in content:
             path = page["path"]
-            if "/Lineamientos Areas Transversales de TI/DevOps/" in path:
+            if "/Lineamientos Areas Transversales de TI/" in path:
                 counts = 0
+
+                # check if the page has views stats
+                if "viewStats" not in page:
+                    continue
+
+                # sum all views
                 for viewStat in page["viewStats"]:
                     counts += viewStat["count"]
+
+                # create a new object with the path and the views
                 obj = {"path": path, "views": counts}
                 new_content.append(obj)
 
